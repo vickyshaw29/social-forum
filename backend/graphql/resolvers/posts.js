@@ -1,6 +1,7 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
 const Posts = require('../../models/post');
 const checkAuth = require('../../utils/check-auth');
+
 module.exports = {
   Query: {
     async getPosts() {
@@ -24,9 +25,13 @@ module.exports = {
       }
     },
   },
+
   Mutation: {
     async createPost(_, { body }, context) {
       const user = checkAuth(context);
+      if(body.trim()===''){
+        throw new Error('Post body must not be empty')
+      }
       const newPost = new Posts({
         body,
         user: user.indexOf,
@@ -54,8 +59,8 @@ module.exports = {
       const { username } = checkAuth(context);
       const post = await Posts.findById(postId);
       if (post) {
+        // post already liked, unlike it
         if (post.likes.find((like) => like.username === username)) {
-          // post already liked , unlike it
           post.likes = post.likes.filter((like) => like.username !== username);
         } else {
           // like post
@@ -63,12 +68,11 @@ module.exports = {
             username,
             createdAt: new Date().toISOString(),
           });
-          await post.save();
-          return post;
         }
-      } else {
-        throw new UserInputError('Poes doesnt exist');
-      }
+        await post.save();
+        return post;
+      } else throw new UserInputError('Poes doesnt exist');
     },
+
   },
 };
