@@ -1,39 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { gql } from 'graphql-tag';
-import { useQuery,useMutation } from '@apollo/react-hooks';
-import {CREATE_COMMENT} from '../mutation/Mutations'
-const HomePage = () => {
-  const { loading, data } = useQuery(FETCH_POSTS);
-  const [post, setPost] = useState('')
-  const [createPost ,{loading:loadData,error}]=useMutation(CREATE_COMMENT)
+import { useQuery } from '@apollo/react-hooks';
+import Card from '../components/Cards';
+import { Grid } from '@mui/material';
+import Loader from '../components/stuff/Loader';
+import {FETCH_POSTS} from '../graphQl/Query/Query'
+
+const HomePage = ({history}) => {
+  const { loading,data } = useQuery(FETCH_POSTS);
   const [posts, setPosts] = useState([]);
   useEffect(() => {
     if (data) {
       setPosts(data.getPosts);
     }
   }, [data]);
-  const onClick=()=>{
-    createPost({
-      variables:{
-        body:posts
-      }
-    })
-  }
+  
   return (
-    <div>
-      Hello World !
-    </div>
+    <Grid container>
+      {loading && <Loader/>}
+      <Card posts={posts} history={history}/>
+    </Grid>
   );
 };
 
-const FETCH_POSTS = gql`
-  {
-    getPosts {
-      id
-      username
-      createdAt
-      body
-    }
-  }
-`;
+
 export default HomePage;

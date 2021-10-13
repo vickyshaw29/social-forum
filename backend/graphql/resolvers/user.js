@@ -26,7 +26,7 @@ module.exports = {
       password = await bcrypt.hash(password, 10);
       const { valid, errors } = validateRegister(username, email, password);
       if (!valid) {
-        throw new UserInputError(errors);
+        throw new UserInputError('Fields cannot be empty',{errors});
       }
       const foundUser = await User.findOne({ username });
       if (foundUser) {

@@ -27,12 +27,13 @@ module.exports = {
   },
 
   Mutation: {
-    async createPost(_, { body }, context) {
+    async createPost(_, { title, body }, context) {
       const user = checkAuth(context);
-      if(body.trim()===''){
-        throw new Error('Post body must not be empty')
+      if (body.trim() === '') {
+        throw new Error('Post body must not be empty');
       }
       const newPost = new Posts({
+        title,
         body,
         user: user.indexOf,
         username: user.username,
@@ -42,6 +43,7 @@ module.exports = {
       return post;
     },
     async deletePost(_, { postId }, context) {
+      console.log(postId)
       const user = checkAuth(context);
       try {
         const post = await Posts.findById(postId);
@@ -73,6 +75,5 @@ module.exports = {
         return post;
       } else throw new UserInputError('Poes doesnt exist');
     },
-
   },
 };
